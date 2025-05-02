@@ -1,0 +1,12 @@
+@font-face {
+  font-family: 'Havelock Titling';
+  src: url('fonts/XO-Pretty-Havelock-Titling-Medium.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+h1 a {
+  font-family: 'Havelock Titling', sans-serif !important;
+  font-size: 2em !important;
+  letter-spacing: 0.05em !important;
+}
