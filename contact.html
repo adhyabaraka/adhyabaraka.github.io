@@ -48,6 +48,12 @@
 	<script src="js/respond.min.js"></script>
 	<![endif]-->
 
+	<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
 	</head>
 	<body>
 	
@@ -137,7 +143,8 @@
 		</div>	
 	</div>
 
-	<div id="map" class="animate-box" data-animate-effect="fadeIn"></div>
+	<div id="map" style="height: 400px; width: 100%;"></div>
+
 
 	<footer id="fh5co-footer" role="contentinfo">
 	
@@ -197,6 +204,22 @@
 	<!-- Google Map -->
 	<!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCefOgb1ZWqYtj7raVSmN4PL2WkTrc-KyA&sensor=false"></script>
 	<script src="js/google_map.js"></script> -->
+
+	<!-- Script Leaflet -->
+	<script>
+		// Inisialisasi peta dengan koordinat kantor
+		const map = L.map('map').setView([-6.230121, 107.070944], 15); // Zoom 15 untuk tampilan dekat
+	  
+		// Tile OpenStreetMap
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		  attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+		}).addTo(map);
+	  
+		// Marker lokasi kantor
+		L.marker([-6.230121, 107.070944]).addTo(map)
+		  .bindPopup('PT Adhya Meliora Baraka<br>Office Location')
+		  .openPopup();
+	  </script>
 	
 	<!-- MAIN JS -->
 	<script src="js/main.js"></script>
