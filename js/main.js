@@ -199,7 +199,80 @@
 
 
 	
+	var stickyHeader = function() {
+		var $h = $('#fh5co-header');
+		var toggle = function() { $h.toggleClass('scrolled', $(window).scrollTop() > 40); };
+		$(window).on('scroll', toggle);
+		toggle();
+	};
+
+	var scrollExtras = function() {
+		var $bar = $('<div id="scroll-bar" />').appendTo('body');
+		var $top = $('<a href="#" class="to-top" aria-label="Back to top"></a>').appendTo('body');
+		var update = function() {
+			var y = $(window).scrollTop(), max = $(document).height() - $(window).height();
+			$bar.css('width', (max > 0 ? y / max * 100 : 0) + '%');
+			$top.toggleClass('show', y > 600);
+		};
+		$top.on('click', function(e){ e.preventDefault(); $('html, body').animate({ scrollTop: 0 }, 600); });
+		$(window).on('scroll', update);
+		update();
+	};
+
+	// Send Message: carry the form fields into the mail the visitor's mail app opens
+	var contactForm = function() {
+		var $f = $('.contact-card-form');
+		$f.find('a.btn').on('click', function(){
+			var v = function(i){ return $.trim($f.find('.form-control').eq(i).val()); };
+			this.href = 'mailto:admin@adhyabaraka.com?subject=' + encodeURIComponent('Message from ' + (v(0) || 'website')) +
+				'&body=' + encodeURIComponent(v(2) + '\n\nName: ' + v(0) + '\nEmail: ' + v(1));
+		});
+	};
+
+	// Apple-style reveal: items fade/rise in one by one as they enter the viewport
+	var scrollReveal = function() {
+		if (!('IntersectionObserver' in window)) return;   // old browsers: leave everything visible
+		var $all = $('.fh5co-heading, .item-block, .fh5co-staff, .fh5co-box, .fh5co-about figure, .fh5co-about .col-md-8, .contact-card, #fh5co-grid-products .item-grid')
+			.add($('.fh5co-entry').parent());   // blog card has its own hover transform, so animate its wrapper
+		// replaces the old whole-section fade
+		$('.animate-box').has($all).add($all.filter('.animate-box')).removeClass('animate-box');
+		// box + product tiles use CSS scroll-driven zoom where supported (Chrome/Edge/Safari 26), reveal elsewhere
+		var scrub = window.CSS && CSS.supports && CSS.supports('animation-timeline: view()');
+		var $t = scrub ? $all.not('.fh5co-box, .item-grid') : $all;
+
+		// items sitting side by side in one row fly in from left / centre / right
+		var rows = {};
+		$t.each(function(){
+			var top = Math.round(this.getBoundingClientRect().top + window.pageYOffset);
+			(rows[top] = rows[top] || []).push(this);
+		});
+		$.each(rows, function(_, row){
+			if (row.length > 1) $.each(row, function(i, el){ el.style.setProperty('--x', row.length === 2 ? i * 2 - 1 : (i % 3) - 1); });
+		});
+		$t.addClass('reveal');
+
+		var io = new IntersectionObserver(function(entries){
+			var i = 0;   // entries that appear together get staggered
+			entries.forEach(function(e){
+				var el = e.target;
+				if (!e.isIntersecting) {   // left the screen (either side): reset so it animates again when scrolled back
+					el.style.transitionDelay = '';
+					el.classList.remove('in');
+					return;
+				}
+				el.style.transitionDelay = (i++ * 160) + 'ms';
+				el.classList.add('in');
+				setTimeout(function(){ el.style.transitionDelay = ''; }, 2000);
+			});
+		}, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+		$t.each(function(){ io.observe(this); });
+	};
+
 	$(function(){
+		contactForm();
+		scrollReveal();
+		scrollExtras();
+		stickyHeader();
 		fullHeight();
 		sliderMain();
 		centerBlock();
