@@ -199,7 +199,15 @@
 
 
 	
+	var stickyHeader = function() {
+		var $h = $('#fh5co-header');
+		var toggle = function() { $h.toggleClass('scrolled', $(window).scrollTop() > 40); };
+		$(window).on('scroll', toggle);
+		toggle();
+	};
+
 	$(function(){
+		stickyHeader();
 		fullHeight();
 		sliderMain();
 		centerBlock();
