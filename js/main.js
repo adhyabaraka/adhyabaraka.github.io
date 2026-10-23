@@ -206,7 +206,58 @@
 		toggle();
 	};
 
+	var scrollExtras = function() {
+		var $bar = $('<div id="scroll-bar" />').appendTo('body');
+		var $top = $('<a href="#" class="to-top" aria-label="Back to top"><i class="icon-arrow-right"></i></a>').appendTo('body');
+		var update = function() {
+			var y = $(window).scrollTop(), max = $(document).height() - $(window).height();
+			$bar.css('width', (max > 0 ? y / max * 100 : 0) + '%');
+			$top.toggleClass('show', y > 600);
+		};
+		$top.on('click', function(e){ e.preventDefault(); $('html, body').animate({ scrollTop: 0 }, 600); });
+		$(window).on('scroll', update);
+		update();
+	};
+
+	// Apple-style reveal: items fade/rise in one by one as they enter the viewport
+	var scrollReveal = function() {
+		if (!('IntersectionObserver' in window)) return;   // old browsers: leave everything visible
+		var $t = $('.fh5co-heading, .item-block, .fh5co-staff, .fh5co-box, .fh5co-about figure, .fh5co-about .col-md-8, .contact-card, #fh5co-grid-products .item-grid')
+			.add($('.fh5co-entry').parent());   // blog card has its own hover transform, so animate its wrapper
+		// replaces the old whole-section fade
+		$('.animate-box').has($t).add($t.filter('.animate-box')).removeClass('animate-box');
+
+		// items sitting side by side in one row fly in from left / centre / right
+		var rows = {};
+		$t.each(function(){
+			var top = Math.round(this.getBoundingClientRect().top + window.pageYOffset);
+			(rows[top] = rows[top] || []).push(this);
+		});
+		$.each(rows, function(_, row){
+			if (row.length > 1) $.each(row, function(i, el){ el.style.setProperty('--x', row.length === 2 ? i * 2 - 1 : (i % 3) - 1); });
+		});
+		$t.addClass('reveal');
+
+		var io = new IntersectionObserver(function(entries){
+			var i = 0;   // entries that appear together get staggered
+			entries.forEach(function(e){
+				var el = e.target;
+				if (!e.isIntersecting) {   // left the screen (either side): reset so it animates again when scrolled back
+					el.style.transitionDelay = '';
+					el.classList.remove('in');
+					return;
+				}
+				el.style.transitionDelay = (i++ * 160) + 'ms';
+				el.classList.add('in');
+				setTimeout(function(){ el.style.transitionDelay = ''; }, 2000);
+			});
+		}, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+		$t.each(function(){ io.observe(this); });
+	};
+
 	$(function(){
+		scrollReveal();
+		scrollExtras();
 		stickyHeader();
 		fullHeight();
 		sliderMain();
