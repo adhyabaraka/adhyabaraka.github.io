@@ -208,7 +208,7 @@
 
 	var scrollExtras = function() {
 		var $bar = $('<div id="scroll-bar" />').appendTo('body');
-		var $top = $('<a href="#" class="to-top" aria-label="Back to top"><i class="icon-arrow-right"></i></a>').appendTo('body');
+		var $top = $('<a href="#" class="to-top" aria-label="Back to top"></a>').appendTo('body');
 		var update = function() {
 			var y = $(window).scrollTop(), max = $(document).height() - $(window).height();
 			$bar.css('width', (max > 0 ? y / max * 100 : 0) + '%');
@@ -219,13 +219,26 @@
 		update();
 	};
 
+	// Send Message: carry the form fields into the mail the visitor's mail app opens
+	var contactForm = function() {
+		var $f = $('.contact-card-form');
+		$f.find('a.btn').on('click', function(){
+			var v = function(i){ return $.trim($f.find('.form-control').eq(i).val()); };
+			this.href = 'mailto:admin@adhyabaraka.com?subject=' + encodeURIComponent('Message from ' + (v(0) || 'website')) +
+				'&body=' + encodeURIComponent(v(2) + '\n\nName: ' + v(0) + '\nEmail: ' + v(1));
+		});
+	};
+
 	// Apple-style reveal: items fade/rise in one by one as they enter the viewport
 	var scrollReveal = function() {
 		if (!('IntersectionObserver' in window)) return;   // old browsers: leave everything visible
-		var $t = $('.fh5co-heading, .item-block, .fh5co-staff, .fh5co-box, .fh5co-about figure, .fh5co-about .col-md-8, .contact-card, #fh5co-grid-products .item-grid')
+		var $all = $('.fh5co-heading, .item-block, .fh5co-staff, .fh5co-box, .fh5co-about figure, .fh5co-about .col-md-8, .contact-card, #fh5co-grid-products .item-grid')
 			.add($('.fh5co-entry').parent());   // blog card has its own hover transform, so animate its wrapper
 		// replaces the old whole-section fade
-		$('.animate-box').has($t).add($t.filter('.animate-box')).removeClass('animate-box');
+		$('.animate-box').has($all).add($all.filter('.animate-box')).removeClass('animate-box');
+		// box + product tiles use CSS scroll-driven zoom where supported (Chrome/Edge/Safari 26), reveal elsewhere
+		var scrub = window.CSS && CSS.supports && CSS.supports('animation-timeline: view()');
+		var $t = scrub ? $all.not('.fh5co-box, .item-grid') : $all;
 
 		// items sitting side by side in one row fly in from left / centre / right
 		var rows = {};
@@ -256,6 +269,7 @@
 	};
 
 	$(function(){
+		contactForm();
 		scrollReveal();
 		scrollExtras();
 		stickyHeader();
